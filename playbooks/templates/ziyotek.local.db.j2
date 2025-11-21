@@ -1,0 +1,19 @@
+$TTL 86400
+@   IN  SOA  prdx-nsprimary101. admin.ziyotek.local. (
+            2025111701 ; serial YYYYMMDDnn
+            3600       ; refresh
+            1800       ; retry
+            604800     ; expire
+            86400 )    ; minimum
+
+    IN  NS  prdx-nsprimary101.ziyotek.local.
+
+; A records
+{% for rec in zone_records %}
+{{ rec.name }}    IN  A   {{ rec.ip }}
+{% endfor %}
+
+; CNAME records
+{% for alias in cname_records %}
+{{ alias.alias }}    IN  CNAME   {{ alias.target }}.
+{% endfor %}

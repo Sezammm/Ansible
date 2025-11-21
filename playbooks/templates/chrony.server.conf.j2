@@ -1,0 +1,14 @@
+# chrony NTP server config
+
+{% for upstream in upstreams %}
+server {{ upstream }} iburst
+{% endfor %}
+
+allow {{ allow_net }}
+
+local stratum 10
+
+driftfile /var/lib/chrony/drift
+makestep 1.0 3
+rtcsync
+logdir /var/log/chrony

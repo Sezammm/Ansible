@@ -1,0 +1,13 @@
+$TTL 86400
+@   IN  SOA  prdx-nsprimary101. admin.ziyotek.local. (
+            2025111701 ; serial
+            3600
+            1800
+            604800
+            86400 )
+
+    IN  NS  prdx-nsprimary101.ziyotek.local.
+
+{% for rec in zone_records %}
+{{ rec.ip.split('.')[3] }}    IN PTR   {{ rec.name }}.ziyotek.local.
+{% endfor %}

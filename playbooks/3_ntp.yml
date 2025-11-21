@@ -1,0 +1,86 @@
+---
+
+############################
+#  NTP SERVER CONFIGURATION
+############################
+- name: Configure NTP server
+  hosts: ntp
+  become: true
+
+  vars:
+    allow_net: "192.168.3.0/24"
+    upstreams:
+      - "0.pool.ntp.org"
+      - "1.pool.ntp.org"
+      - "2.pool.ntp.org"
+      - "3.pool.ntp.org"
+
+  tasks:
+    - name: Install chrony on server
+      ansible.builtin.yum:
+        name: chrony
+        state: present
+
+    - name: Deploy chrony.conf (server)
+      ansible.builtin.template:
+        src: templates/chrony.server.conf.j2
+        dest: /etc/chrony.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: restart chronyd
+
+    - name: Enable and start chronyd
+      ansible.builtin.service:
+        name: chronyd
+        state: started
+        enabled: true
+
+    - name: Allow NTP service in firewalld
+      ansible.builtin.firewalld:
+        service: ntp
+        permanent: true
+        immediate: true
+        state: enabled
+
+
+############################
+#  NTP CLIENT CONFIGURATION
+############################
+- name: Configure NTP clients
+  hosts: clients
+  become: true
+
+  vars:
+    ntp_server_ip: "192.168.3.202"
+
+  tasks:
+    - name: Install chrony on client
+      ansible.builtin.yum:
+        name: chrony
+        state: present
+
+    - name: Deploy chrony.conf (client)
+      ansible.builtin.template:
+        src: templates/chrony.client.conf.j2
+        dest: /etc/chrony.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: restart chronyd
+
+    - name: Enable chronyd service
+      ansible.builtin.service:
+        name: chronyd
+        state: started
+        enabled: true
+
+
+############################
+#  HANDLERS
+############################
+  handlers:
+  - name: restart chronyd
+    ansible.builtin.service:
+      name: chronyd
+      state: restarted
