@@ -1,0 +1,20 @@
+---
+- name: Install chrony on client
+  ansible.builtin.yum:
+    name: chrony
+    state: present
+
+- name: Deploy chrony.conf (client)
+  ansible.builtin.template:
+    src: chrony.client.conf.j2
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart chronyd
+
+- name: Enable chronyd service
+  ansible.builtin.service:
+    name: chronyd
+    state: started
+    enabled: true

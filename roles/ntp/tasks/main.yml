@@ -1,0 +1,28 @@
+---
+- name: Install chrony on server
+  ansible.builtin.yum:
+    name: chrony
+    state: present
+
+- name: Deploy chrony.conf (server)
+  ansible.builtin.template:
+    src: chrony.server.conf.j2
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart chronyd
+
+- name: Enable and start chronyd
+  ansible.builtin.service:
+    name: chronyd
+    state: started
+    enabled: true
+
+- name: Allow NTP service in firewalld
+  ansible.builtin.firewalld:
+    service: ntp
+    permanent: true
+    immediate: true
+    state: enabled
+

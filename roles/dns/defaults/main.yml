@@ -1,0 +1,39 @@
+---
+zone_name: "ziyotek.local"
+zone_file: "/var/named/ziyotek.local.db"
+
+reverse_zone_name: "3.168.192.in-addr.arpa"
+reverse_zone_file: "/var/named/3.168.192.in-addr.arpa.db"
+
+forwarders:
+  - "8.8.8.8"
+  - "1.1.1.1"
+
+zone_records:
+  - { name: "prdx-ansible101",   ip: "192.168.3.200" }
+  - { name: "prdx-nsprimary101", ip: "192.168.3.201" }
+  - { name: "prdx-ntp101",       ip: "192.168.3.202" }
+  - { name: "prdx-db101",        ip: "192.168.3.203" }
+  - { name: "prdx-webserver101", ip: "192.168.3.204" }
+  - { name: "prdx-haproxy101",   ip: "192.168.3.205" }
+  - { name: "prdx-nagios101",    ip: "192.168.3.206" }
+  - { name: "prdx-ftp101",       ip: "192.168.3.207" }
+  - { name: "prdx-nfs101",       ip: "192.168.3.208" }
+  - { name: "prdx-dprimary101",  ip: "192.168.3.209" }
+  - { name: "prdx-dworker101",   ip: "192.168.3.210" }
+  - { name: "prdx-dworker102",   ip: "192.168.3.211" }
+
+cname_records:
+  - { alias: "ansible",      target: "prdx-ansible101.ziyotek.local" }
+  - { alias: "dns",          target: "prdx-nsprimary101.ziyotek.local" }
+  - { alias: "ntp",          target: "prdx-ntp101.ziyotek.local" }
+  - { alias: "db",           target: "prdx-db101.ziyotek.local" }
+  - { alias: "webserver",    target: "prdx-webserver101.ziyotek.local" }
+  - { alias: "loadbalancer", target: "prdx-haproxy101.ziyotek.local" }
+  - { alias: "nagios",       target: "prdx-nagios101.ziyotek.local" }
+  - { alias: "ftp",          target: "prdx-ftp101.ziyotek.local" }
+  - { alias: "nfs",          target: "prdx-nfs101.ziyotek.local" }
+  - { alias: "docker",       target: "prdx-dprimary101.ziyotek.local" }
+  - { alias: "dockw1",       target: "prdx-dworker101.ziyotek.local" }
+  - { alias: "dockw2",       target: "prdx-dworker102.ziyotek.local" }
+

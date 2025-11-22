@@ -1,0 +1,3 @@
+---
+dns_server: "192.168.3.201"
+search_domain: "ziyotek.local"

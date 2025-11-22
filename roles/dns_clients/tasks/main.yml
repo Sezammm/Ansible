@@ -1,0 +1,22 @@
+---
+- name: Get active nm connection name
+  ansible.builtin.shell: nmcli -t -f NAME connection show --active | head -n1
+  register: conn_name
+  changed_when: false
+
+- name: Configure connection DNS and search domain
+  ansible.builtin.shell: |
+    conn="{{ conn_name.stdout }}"
+    nmcli connection modify "$conn" ipv4.dns "{{ dns_server }}" ipv4.dns-search "{{ search_domain }}"
+    nmcli connection up "$conn" >/dev/null 2>&1 || true
+  args:
+    executable: /bin/bash
+
+- name: Show resolv settings
+  ansible.builtin.shell: nmcli -g ipv4.dns,ipv4.dns-search connection show "{{ conn_name.stdout }}"
+  register: res
+  changed_when: false
+
+- name: Debug dns settings
+  ansible.builtin.debug:
+    var: res.stdout_lines

@@ -1,0 +1,24 @@
+---
+- name: Configure DNS server
+  hosts: dns
+  become: true
+  roles:
+    - dns
+
+- name: Configure DNS clients
+  hosts: clients
+  become: true
+  roles:
+    - dns_clients
+
+- name: Configure NTP server
+  hosts: ntp
+  become: true
+  roles:
+    - ntp
+
+- name: Configure NTP clients
+  hosts: clients
+  become: true
+  roles:
+    - ntp_client
