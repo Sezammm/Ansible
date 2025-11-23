@@ -1,0 +1,86 @@
+# Managed by Ansible (hosts.cfg)
+
+define host{
+    use             linux-server
+    host_name       prdx-ansible101
+    alias           Ansible Master
+    address         192.168.3.200
+}
+
+define host{
+    use             linux-server
+    host_name       prdx-nsprimary101
+    alias           DNS Server
+    address         192.168.3.201
+}
+
+define host{
+    use             linux-server
+    host_name       prdx-ntp101
+    alias           NTP Server
+    address         192.168.3.202
+}
+
+define host{
+    use             linux-server
+    host_name       prdx-db101
+    alias           Database Server
+    address         192.168.3.203
+}
+
+define host{
+    use             linux-server
+    host_name       prdx-webserver101
+    alias           Web Server
+    address         192.168.3.204
+}
+
+define host{
+    use             linux-server
+    host_name       prdx-haproxy101
+    alias           Load Balancer
+    address         192.168.3.205
+}
+
+define host{
+    use             linux-server
+    host_name       prdx-nagios101
+    alias           Nagios Server
+    address         192.168.3.206
+}
+
+define host{
+    use             linux-server
+    host_name       prdx-ftp101
+    alias           FTP Server
+    address         192.168.3.207
+}
+
+define host{
+    use             linux-server
+    host_name       prdx-nfs101
+    alias           NFS Server
+    address         192.168.3.208
+}
+
+define host{
+    use             linux-server
+    host_name       prdx-dprimary101
+    alias           Docker Manager
+    address         192.168.3.209
+}
+
+define host{
+    use             linux-server
+    host_name       prdx-dworker101
+    alias           Docker Worker 1
+    address         192.168.3.210
+}
+
+define host{
+    use             linux-server
+    host_name       prdx-dworker102
+    alias           Docker Worker 2
+    address         192.168.3.211
+}
+

@@ -1,0 +1,18 @@
+# Managed by Ansible (services.cfg)
+
+# Load via NRPE
+define service{
+    use                     generic-service
+    host_name               prdx-ansible101,prdx-nsprimary101,prdx-ntp101,prdx-db101,prdx-webserver101,prdx-haproxy101,prdx-nagios101,prdx-ftp101,prdx-nfs101,prdx-dprimary101,prdx-dworker101,prdx-dworker102
+    service_description     Load
+    check_command           check_nrpe!check_load
+}
+
+# Disk root via NRPE
+define service{
+    use                     generic-service
+    host_name               prdx-ansible101,prdx-nsprimary101,prdx-ntp101,prdx-db101,prdx-webserver101,prdx-haproxy101,prdx-nagios101,prdx-ftp101,prdx-nfs101,prdx-dprimary101,prdx-dworker101,prdx-dworker102
+    service_description     Disk Root /
+    check_command           check_nrpe!check_disk_root
+}
+
