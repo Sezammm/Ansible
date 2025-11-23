@@ -101,6 +101,16 @@
     name: nagios-plugins-nrpe
     state: present
 
+- name: Install core Nagios plugins on Nagios server
+  ansible.builtin.yum:
+    name:
+      - nagios-plugins-ping
+      - nagios-plugins-disk
+      - nagios-plugins-load
+      - nagios-plugins-procs
+      - nagios-plugins-users
+    state: present
+
 - name: Ensure check_nrpe command is defined in Nagios
   ansible.builtin.blockinfile:
     path: /usr/local/nagios/etc/objects/commands.cfg
@@ -110,6 +120,19 @@
           command_name    check_nrpe
           command_line    /usr/lib64/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
       }
+  notify: restart nagios
+
+- name: Fix plugin path in default Nagios commands
+  ansible.builtin.replace:
+    path: /usr/local/nagios/etc/objects/commands.cfg
+    regexp: '/usr/local/nagios/libexec'
+    replace: '/usr/lib64/nagios/plugins'
+  notify: restart nagios
+
+- name: Ensure check_nrpe command is defined in Nagios
+  ansible.builtin.blockinfile:
+    path: /usr/local/nagios/etc/objects/commands.cfg
+    ...
   notify: restart nagios
 
 # -------------------- hosts/services through a separate directory -----------
