@@ -23,6 +23,14 @@
     mode: "0644"
   notify: restart nrpe
 
+- name: Ensure NRPE run directory exists
+  ansible.builtin.file:
+    path: /run/nrpe
+    state: directory
+    owner: nrpe
+    group: nrpe
+    mode: "0755"
+
 - name: Enable and start NRPE service
   ansible.builtin.service:
     name: nrpe
