@@ -36,3 +36,10 @@
     name: nrpe
     state: started
     enabled: true
+
+- name: Open NRPE port in firewalld
+  ansible.builtin.firewalld:
+    port: 5666/tcp
+    permanent: true
+    immediate: true
+    state: enabled
