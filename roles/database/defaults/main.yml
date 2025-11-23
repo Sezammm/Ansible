@@ -1,0 +1,11 @@
+---
+# Root password for MariaDB. For LAB okay to keep here in plain text.
+mysql_root_password: "ChangeMeRoot123!"
+
+# Application database and user
+app_db_name: "labapp"
+app_db_user: "labuser"
+app_db_password: "LabUserPass123!"
+
+# Should MariaDB listen on all interfaces (0.0.0.0) for remote access
+mysql_bind_address: "0.0.0.0"

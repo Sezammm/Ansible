@@ -22,3 +22,15 @@
   become: true
   roles:
     - ntp_client
+
+- name: Configure Database server (MariaDB)
+  hosts: database
+  become: true
+  roles:
+    - database
+
+- name: Configure Web server (Apache)
+  hosts: web
+  become: true
+  roles:
+    - web

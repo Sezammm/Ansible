@@ -1,0 +1,98 @@
+---
+- name: Install MariaDB server and client
+  ansible.builtin.yum:
+    name:
+      - mariadb-server
+      - mariadb
+      - python3-PyMySQL
+    state: present
+
+- name: Enable and start MariaDB service
+  ansible.builtin.service:
+    name: mariadb
+    state: started
+    enabled: true
+
+# ---------- Bind-address (for receive connect not only from localhost) ----------
+
+- name: Ensure MariaDB listens on all interfaces
+  ansible.builtin.lineinfile:
+    path: /etc/my.cnf.d/mariadb-server.cnf
+    regexp: '^bind-address'
+    line: "bind-address={{ mysql_bind_address }}"
+    insertafter: '^\[mysqld\]'
+  notify: restart mariadb
+  ignore_errors: true   # just incase if file/stroka different in Rocky
+
+# ---------- Root password (do only once) ----------
+
+- name: Check if MariaDB root password already set (marker file)
+  ansible.builtin.stat:
+    path: /root/.mysql_root_password_set
+  register: root_pw_flag
+
+- name: Set MariaDB root password (first time only)
+  ansible.builtin.shell: |
+    mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_root_password }}';"
+  when: not root_pw_flag.stat.exists
+  notify: restart mariadb
+
+- name: Create marker file for root password
+  ansible.builtin.file:
+    path: /root/.mysql_root_password_set
+    state: touch
+  when: not root_pw_flag.stat.exists
+
+# ---------- Simple hardening (similar mysql_secure_installation, simlpicity) ----------
+
+- name: Remove anonymous MariaDB users
+  ansible.builtin.shell: |
+    mysql -u root -p'{{ mysql_root_password }}' -e "DELETE FROM mysql.user WHERE User='';"
+  changed_when: false
+
+- name: Drop test database if exists
+  ansible.builtin.shell: |
+    mysql -u root -p'{{ mysql_root_password }}' -e "DROP DATABASE IF EXISTS test;"
+  changed_when: false
+
+- name: Flush MariaDB privileges
+  ansible.builtin.shell: |
+    mysql -u root -p'{{ mysql_root_password }}' -e "FLUSH PRIVILEGES;"
+  changed_when: false
+
+# ---------- Application DB and user ----------
+
+- name: Create application database
+  ansible.builtin.shell: |
+    mysql -u root -p'{{ mysql_root_password }}' -e "CREATE DATABASE IF NOT EXISTS {{ app_db_name }};"
+  changed_when: false
+
+- name: Create application DB user and grant privileges
+  ansible.builtin.shell: |
+    mysql -u root -p'{{ mysql_root_password }}' -e "\
+      CREATE USER IF NOT EXISTS '{{ app_db_user }}'@'%' IDENTIFIED BY '{{ app_db_password }}'; \
+      GRANT ALL PRIVILEGES ON {{ app_db_name }}.* TO '{{ app_db_user }}'@'%'; \
+      FLUSH PRIVILEGES; \
+    "
+  changed_when: false
+
+# ---------- Firewall ----------
+
+- name: Open MariaDB port in firewalld
+  ansible.builtin.firewalld:
+    port: 3306/tcp
+    permanent: true
+    immediate: true
+    state: enabled
+
+# ---------- Simple check ----------
+
+- name: Check that application database exists
+  ansible.builtin.shell: |
+    mysql -u root -p'{{ mysql_root_password }}' -e "SHOW DATABASES LIKE '{{ app_db_name }}';"
+  register: db_check
+  changed_when: false
+
+- name: Debug database check result
+  ansible.builtin.debug:
+    var: db_check.stdout_lines

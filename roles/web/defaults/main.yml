@@ -1,0 +1,10 @@
+---
+# Document root for Apache
+web_root: "/var/www/html"
+
+# Title and role label for the web page
+web_page_title: "LAB Web Server"
+web_role_name: "WEB SERVER (prdx-webserver101)"
+
+# Whether to open HTTPS too (not use but possible to activate later)
+open_https: false

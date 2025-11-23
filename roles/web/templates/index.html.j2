@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{{ web_page_title }}</title>
+  </head>
+  <body>
+    <h1>{{ web_page_title }}</h1>
+
+    <h2>Server info</h2>
+    <ul>
+      <li><strong>Hostname:</strong> {{ ansible_facts['hostname'] }}</li>
+      <li><strong>FQDN:</strong> {{ ansible_facts.get('fqdn', 'unknown') }}</li>
+      <li><strong>IP address:</strong> {{ ansible_facts['default_ipv4']['address'] }}</li>
+      <li><strong>Role:</strong> {{ web_role_name }}</li>
+    </ul>
+
+    <hr>
+    <p>Managed by Ansible role (Sezam) <code>web</code>.</p>
+  </body>
+</html>
