@@ -26,7 +26,41 @@
     state: enabled
   when: open_https | bool
 
-- name: Deploy index.html from template
+# ---------- Virtual hosts: directories and index.html ----------
+
+- name: Create base directory for vhosts
+  ansible.builtin.file:
+    path: "{{ vhosts_base_dir }}"
+    state: directory
+    owner: apache
+    group: apache
+    mode: "0755"
+
+- name: Create document roots for each vhost
+  ansible.builtin.file:
+    path: "{{ vhost.docroot }}"
+    state: directory
+    owner: apache
+    group: apache
+    mode: "0755"
+  loop: "{{ vhosts }}"
+  loop_control:
+    loop_var: vhost
+
+- name: Deploy index.html for each vhost
+  ansible.builtin.template:
+    src: vhost_index.html.j2
+    dest: "{{ vhost.docroot }}/index.html"
+    owner: apache
+    group: apache
+    mode: "0644"
+  loop: "{{ vhosts }}"
+  loop_control:
+    loop_var: vhost
+  notify: restart httpd
+
+# (if need to leave it as default /var/www/html/index.html - can leave this block)
+- name: Deploy default index.html for main site
   ansible.builtin.template:
     src: index.html.j2
     dest: "{{ web_root }}/index.html"
@@ -35,7 +69,20 @@
     mode: "0644"
   notify: restart httpd
 
-- name: Ensure SELinux context on web root
+# ---------- Apache config  for virtuals hosts ----------
+
+- name: Deploy Apache vhosts configuration
+  ansible.builtin.template:
+    src: vhosts.conf.j2
+    dest: /etc/httpd/conf.d/vhosts.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart httpd
+
+# ---------- SELinux ----------
+
+- name: Ensure SELinux context on web directories
   ansible.builtin.shell: |
-    restorecon -Rv {{ web_root }} || true
+    restorecon -Rv {{ web_root }} {{ vhosts_base_dir }} || true
   changed_when: false

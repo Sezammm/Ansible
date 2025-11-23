@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Virtual host {{ vhost.name }}</title>
+  </head>
+  <body>
+    <h1>Virtual Host: {{ vhost.name }}</h1>
+
+    <h2>Server info</h2>
+    <ul>
+      <li><strong>ServerName:</strong> {{ vhost.servername }}</li>
+      <li><strong>Hostname:</strong> {{ ansible_facts['hostname'] }}</li>
+      <li><strong>FQDN:</strong> {{ ansible_facts.get('fqdn', 'unknown') }}</li>
+      <li><strong>IP address:</strong> {{ ansible_facts['default_ipv4']['address'] }}</li>
+    </ul>
+
+    <hr>
+    <p>This is virtual host <strong>{{ vhost.name }}</strong> managed by Ansible role (Sezammm) <code>web</code>.</p>
+  </body>
+</html>

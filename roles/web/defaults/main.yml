@@ -1,10 +1,29 @@
 ---
-# Document root for Apache
+# Document root for default site (if needed)
 web_root: "/var/www/html"
 
-# Title and role label for the web page
+# Title and role label for the default web page
 web_page_title: "LAB Web Server"
 web_role_name: "WEB SERVER (prdx-webserver101)"
 
 # Whether to open HTTPS too (not use but possible to activate later)
 open_https: false
+
+# Virtual hosts configuration
+vhosts_base_dir: "/var/www/vhosts"
+
+vhosts:
+  - name: vhost1
+    servername: "vhost1.ziyotek.local"
+    docroot: "/var/www/vhosts/vhost1"
+    log_suffix: "vhost1"
+
+  - name: vhost2
+    servername: "vhost2.ziyotek.local"
+    docroot: "/var/www/vhosts/vhost2"
+    log_suffix: "vhost2"
+
+  - name: vhost3
+    servername: "vhost3.ziyotek.local"
+    docroot: "/var/www/vhosts/vhost3"
+    log_suffix: "vhost3"

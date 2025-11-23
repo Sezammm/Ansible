@@ -36,4 +36,6 @@ cname_records:
   - { alias: "docker",       target: "prdx-dprimary101.ziyotek.local" }
   - { alias: "dockw1",       target: "prdx-dworker101.ziyotek.local" }
   - { alias: "dockw2",       target: "prdx-dworker102.ziyotek.local" }
-
+  - { alias: "vhost1", target: "prdx-webserver101.ziyotek.local" }
+  - { alias: "vhost2", target: "prdx-webserver101.ziyotek.local" }
+  - { alias: "vhost3", target: "prdx-webserver101.ziyotek.local" }

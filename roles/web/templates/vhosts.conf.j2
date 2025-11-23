@@ -1,0 +1,18 @@
+# Managed by Ansible (role: web)
+
+{% for v in vhosts %}
+<VirtualHost *:80>
+    ServerName {{ v.servername }}
+
+    DocumentRoot {{ v.docroot }}
+
+    ErrorLog "logs/{{ v.log_suffix | default(v.name) }}_error.log"
+    CustomLog "logs/{{ v.log_suffix | default(v.name) }}_access.log" combined
+
+    <Directory "{{ v.docroot }}">
+        AllowOverride None
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+{% endfor %}
