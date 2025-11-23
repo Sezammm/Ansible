@@ -1,0 +1,81 @@
+---
+# Install and configure Nagios Core
+
+- name: Install required packages
+  yum:
+    name:
+      - httpd
+      - php
+      - gcc
+      - glibc
+      - glibc-common
+      - wget
+      - unzip
+      - httpd-tools
+      - gd
+      - gd-devel
+      - perl
+      - openssl
+      - openssl-devel
+    state: present
+
+- name: Ensure nagios user exists
+  user:
+    name: nagios
+    comment: "Nagios monitoring user"
+    shell: /sbin/nologin
+
+- name: Add nagios user to apache group
+  user:
+    name: nagios
+    append: yes
+    groups: apache
+
+- name: Download Nagios Core source
+  get_url:
+    url: https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.4.14.tar.gz
+    dest: /tmp/nagios.tar.gz
+
+- name: Extract Nagios source
+  unarchive:
+    src: /tmp/nagios.tar.gz
+    dest: /tmp/
+    remote_src: yes
+
+- name: Install Nagios Core
+  shell: |
+    cd /tmp/nagios-* &&
+    ./configure &&
+    make all &&
+    make install-groups-users &&
+    make install &&
+    make install-daemoninit &&
+    make install-commandmode &&
+    make install-config
+  args:
+    creates: /usr/local/nagios/bin/nagios
+
+- name: Install Apache config for Nagios
+  shell: |
+    cd /tmp/nagios-* &&
+    make install-webconf
+  notify: restart httpd
+
+- name: Enable Apache CGI
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^#(LoadModule cgi_module modules/mod_cgi.so)'
+    replace: 'LoadModule cgi_module modules/mod_cgi.so'
+  notify: restart httpd
+
+- name: Create nagiosadmin password
+  command: htpasswd -bc /usr/local/nagios/etc/htpasswd.users nagiosadmin Nagios123
+
+- name: Enable and start services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - httpd
+    - nagios

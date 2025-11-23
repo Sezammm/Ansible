@@ -34,3 +34,15 @@
   become: true
   roles:
     - web
+
+- name: Configure NRPE (monitoring agent)
+  hosts: "clients:!nagios:!ansible"
+  become: true
+  roles:
+    - nrpe
+
+- name: Configure Nagios server
+  hosts: nagios
+  become: true
+  roles:
+    - nagios

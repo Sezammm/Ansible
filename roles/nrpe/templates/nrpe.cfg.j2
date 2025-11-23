@@ -1,0 +1,22 @@
+# Managed by Ansible (role: nrpe)
+
+log_facility=daemon
+pid_file=/var/run/nrpe.pid
+server_port={{ nrpe_port }}
+nrpe_user=nrpe
+nrpe_group=nrpe
+
+# Only localhost and Nagios-server
+allowed_hosts=127.0.0.1,{{ nagios_server_ip }}
+
+dont_blame_nrpe=1
+debug=0
+
+command_timeout=60
+connection_timeout=300
+
+# Стандартные проверки
+command[check_load]=/usr/lib64/nagios/plugins/check_load -w 5,4,3 -c 10,6,4
+command[check_disk_root]=/usr/lib64/nagios/plugins/check_disk -w 20% -c 10% -p /
+command[check_procs]=/usr/lib64/nagios/plugins/check_procs -w 150 -c 250
+command[check_users]=/usr/lib64/nagios/plugins/check_users -w 5 -c 10

@@ -1,0 +1,6 @@
+---
+# Nagios server IP that is allowed to talk to NRPE
+nagios_server_ip: "192.168.3.206"
+
+# Порт NRPE
+nrpe_port: 5666

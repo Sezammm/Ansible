@@ -1,0 +1,30 @@
+---
+- name: Ensure EPEL repo installed (for nrpe packages)
+  ansible.builtin.yum:
+    name: epel-release
+    state: present
+
+- name: Install NRPE and basic Nagios plugins
+  ansible.builtin.yum:
+    name:
+      - nrpe
+      - nagios-plugins-load
+      - nagios-plugins-disk
+      - nagios-plugins-procs
+      - nagios-plugins-users
+    state: present
+
+- name: Deploy nrpe.cfg
+  ansible.builtin.template:
+    src: nrpe.cfg.j2
+    dest: /etc/nagios/nrpe.cfg
+    owner: nrpe
+    group: nrpe
+    mode: "0644"
+  notify: restart nrpe
+
+- name: Enable and start NRPE service
+  ansible.builtin.service:
+    name: nrpe
+    state: started
+    enabled: true

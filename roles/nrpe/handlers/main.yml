@@ -1,0 +1,5 @@
+---
+- name: restart nrpe
+  ansible.builtin.service:
+    name: nrpe
+    state: restarted
