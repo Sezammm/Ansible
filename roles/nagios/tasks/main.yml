@@ -129,6 +129,13 @@
     replace: '/usr/lib64/nagios/plugins'
   notify: restart nagios
 
+- name: Fix $USER1$ path in resource.cfg
+  ansible.builtin.replace:
+    path: /usr/local/nagios/etc/resource.cfg
+    regexp: '^\$USER1\$=.*'
+    replace: '$USER1$=/usr/lib64/nagios/plugins'
+  notify: restart nagios
+
 # -------------------- hosts/services through a separate directory -----------
 
 - name: Enable cfg_dir for servers in nagios.cfg
