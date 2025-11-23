@@ -129,12 +129,6 @@
     replace: '/usr/lib64/nagios/plugins'
   notify: restart nagios
 
-- name: Ensure check_nrpe command is defined in Nagios
-  ansible.builtin.blockinfile:
-    path: /usr/local/nagios/etc/objects/commands.cfg
-    ...
-  notify: restart nagios
-
 # -------------------- hosts/services through a separate directory -----------
 
 - name: Enable cfg_dir for servers in nagios.cfg
