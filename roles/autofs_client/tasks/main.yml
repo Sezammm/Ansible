@@ -1,0 +1,36 @@
+---
+- name: Install autofs and NFS client utilities
+  ansible.builtin.yum:
+    name:
+      - autofs
+      - nfs-utils
+    state: present
+
+- name: Create mount root directory
+  ansible.builtin.file:
+    path: "{{ autofs_mount_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy AutoFS NFS map
+  ansible.builtin.template:
+    src: auto.nfs.j2
+    dest: "{{ autofs_map_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure mapping exists in /etc/auto.master
+  ansible.builtin.lineinfile:
+    path: /etc/auto.master
+    regexp: '^{{ autofs_mount_root }}\s+{{ autofs_map_file }}'
+    line: "{{ autofs_mount_root }}  {{ autofs_map_file }}  --timeout=60"
+    state: present
+
+- name: Enable and restart autofs
+  ansible.builtin.service:
+    name: autofs
+    state: restarted
+    enabled: true

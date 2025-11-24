@@ -46,3 +46,15 @@
   become: true
   roles:
     - nagios
+
+- name: Configure NFS server
+  hosts: nfs
+  become: true
+  roles:
+    - nfs_server
+
+- name: Configure AutoFS clients
+  hosts: "clients:!nfs"
+  become: true
+  roles:
+    - autofs_client

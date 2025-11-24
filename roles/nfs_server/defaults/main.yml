@@ -1,0 +1,6 @@
+---
+# Directory for exporting
+nfs_export_dir: /srv/nfs/data
+
+# Allowed subnet
+nfs_network_cidr: 192.168.3.0/24

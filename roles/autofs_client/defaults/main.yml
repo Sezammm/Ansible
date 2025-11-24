@@ -1,0 +1,9 @@
+---
+autofs_mount_root: /mnt/nfs
+autofs_map_file: /etc/auto.nfs
+
+# IP NFS-server
+nfs_server_ip: 192.168.3.208
+
+# Exporting directory on NFS-server
+nfs_export_dir: /srv/nfs/data
