@@ -20,3 +20,11 @@
 - name: Debug dns settings
   ansible.builtin.debug:
     var: res.stdout_lines
+
+- name: Ensure DNS server entry exists in /etc/hosts
+  become: true
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} ANSIBLE MANAGED DNS"
+    block: |
+      192.168.3.201   prdx-nsprimary101.ziyotek.local   prdx-nsprimary101
