@@ -9,13 +9,13 @@
 
     <h2>Server info</h2>
     <ul>
-      <li><strong>ServerName:</strong> {{ vhost.servername }}</li>
+      <li><strong>Server Name:</strong> {{ vhost.servername }}</li>
       <li><strong>Hostname:</strong> {{ ansible_facts['hostname'] }}</li>
       <li><strong>FQDN:</strong> {{ ansible_facts.get('fqdn', 'unknown') }}</li>
       <li><strong>IP address:</strong> {{ ansible_facts['default_ipv4']['address'] }}</li>
     </ul>
 
     <hr>
-    <p>This is virtual host <strong>{{ vhost.name }}</strong> managed by Ansible role (Sezammm) <code>web</code>.</p>
+    <p>This is virtual host <strong>{{ vhost.name }}</strong> managed by Ansible role (by Sezam) <code>web</code>.</p>
   </body>
 </html>
