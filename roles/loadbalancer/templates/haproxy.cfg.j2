@@ -1,0 +1,25 @@
+global
+    log /dev/log    local0
+    log /dev/log    local1 notice
+    maxconn 2048
+    daemon
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5s
+    timeout client  50s
+    timeout server  50s
+
+frontend http_front
+    bind *:{{ listen_port }}
+    default_backend web_back
+
+backend web_back
+    balance roundrobin
+    option httpchk GET /
+{% for srv in backend_servers %}
+    server {{ srv.name }} {{ srv.ip }}:{{ srv.port }} check
+{% endfor %}

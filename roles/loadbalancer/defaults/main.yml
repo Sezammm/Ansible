@@ -1,0 +1,5 @@
+---
+backend_servers:
+  - { name: "dockw1", ip: "192.168.3.210", port: 8080 }
+  - { name: "dockw2", ip: "192.168.3.211", port: 8080 }
+listen_port: 80

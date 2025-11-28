@@ -58,3 +58,22 @@
   become: true
   roles:
     - autofs_client
+
+- name: Configure FTP server
+  hosts: ftp
+  become: true
+  roles:
+    - ftp
+
+- name: Configure Docker web app on workers
+  hosts: docker_workers
+  become: true
+  roles:
+    - docker_common
+    - docker_webapp
+
+- name: Configure Load Balancer (HAProxy)
+  hosts: loadbalancer
+  become: true
+  roles:
+    - loadbalancer

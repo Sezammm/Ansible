@@ -1,0 +1,56 @@
+---
+- name: Ensure NFS autofs path exists
+  ansible.builtin.file:
+    path: /mnt/nfs/data/webcontent
+    state: directory
+
+- name: Create app directory for Docker build
+  ansible.builtin.file:
+    path: /opt/webapp
+    state: directory
+    mode: "0755"
+
+- name: Deploy index.html (не на NFS!)
+  ansible.builtin.copy:
+    dest: /opt/webapp/index.html
+    content: |
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Docker Web {{ ansible_hostname }}</title>
+        </head>
+        <body>
+          <h1>Привет с {{ ansible_hostname }}</h1>
+          <p>Эта страница идет из Docker контейнера, а картинка - с NFS.</p>
+          <img src="/static/image.jpg" alt="NFS image">
+        </body>
+      </html>
+
+- name: Deploy Dockerfile
+  ansible.builtin.copy:
+    dest: /opt/webapp/Dockerfile
+    content: |
+      FROM nginx:alpine
+      COPY index.html /usr/share/nginx/html/index.html
+
+# --- Then everything is through docker CLI ---
+
+- name: Build Docker image labweb
+  ansible.builtin.command: docker build -t labweb:latest .
+  args:
+    chdir: /opt/webapp
+
+- name: Stop and remove old container if exists
+  ansible.builtin.shell: |
+    docker rm -f labweb 2>/dev/null || true
+  args:
+    executable: /bin/bash
+
+- name: Run web container labweb
+  ansible.builtin.command: >
+    docker run -d
+    --name labweb
+    -p 8080:80
+    -v /mnt/nfs/data/webcontent:/usr/share/nginx/html/static:ro
+    labweb:latest
