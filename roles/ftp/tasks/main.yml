@@ -59,10 +59,7 @@
 
       # Log-file (optional)
       xferlog_file=/var/log/vsftpd.log
-
   notify: restart vsftpd
-
-# --- Firewall (already set, but let role to be idempotent) ---
 
 - name: Allow FTP service in firewalld
   ansible.builtin.firewalld:
@@ -79,16 +76,17 @@
     state: enabled
   loop: "{{ range(ftp_pasv_min_port, ftp_pasv_max_port + 1) | list }}"
 
-# --- SELinux ---
-
-- name: Ensure ftpd_use_nfs SELinux boolean is on
+- name: Ensure SELinux boolean ftpd_use_nfs is on
   ansible.posix.seboolean:
     name: ftpd_use_nfs
     state: true
     persistent: true
 
-#- name: Allow FTP server to access NFS via SELinux
-#  ansible.builtin.command: setsebool -P ftpd_use_nfs on
+- name: Allow full FTP SELinux access for LAB
+  ansible.posix.seboolean:
+    name: ftpd_full_access
+    state: true
+    persistent: true
 
 - name: Enable and start vsftpd
   ansible.builtin.service:
@@ -98,6 +96,6 @@
 
 - name: Test write as webftp to NFS webcontent
   ansible.builtin.command: >
-    runuser -u {{ ftp_user }} -- touch {{ ftp_nfs_web_root }}/ansible_test_$$.tmp
+    runuser -u {{ ftp_user }} -- touch {{ ftp_nfs_web_root }}/ansible_test_$$.selinux.tmp
   register: ftp_write_test
   failed_when: ftp_write_test.rc != 0
