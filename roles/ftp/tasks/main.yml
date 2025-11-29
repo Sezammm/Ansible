@@ -1,29 +1,39 @@
 ---
+- name: Ensure /sbin/nologin is listed in /etc/shells
+  ansible.builtin.lineinfile:
+    path: /etc/shells
+    line: /sbin/nologin
+    state: present
+
 - name: Install vsftpd
   ansible.builtin.yum:
     name: vsftpd
     state: present
 
-- name: Ensure NFS path exists (via autofs)
+- name: Ensure NFS webcontent directory exists
   ansible.builtin.file:
-    path: /mnt/nfs/data/webcontent
+    path: "{{ ftp_nfs_web_root }}"
     state: directory
     mode: "0777"
 
-- name: Create ftp user for web content
+- name: Create FTP user for web content
   ansible.builtin.user:
-    name: webftp
-    home: /mnt/nfs/data/webcontent
+    name: "{{ ftp_user }}"
+    home: "{{ ftp_nfs_web_root }}"
     shell: /sbin/nologin
     create_home: no
+    password: "{{ ftp_password_hash }}"
 
-- name: Set ownership on NFS webcontent for ftp user (best effort)
-  ansible.builtin.command: chown -R webftp:webftp /mnt/nfs/data/webcontent
+- name: Set ownership on NFS webcontent for FTP user (best effort)
+  ansible.builtin.command: chown -R {{ ftp_user }}:{{ ftp_user }} {{ ftp_nfs_web_root }}
   ignore_errors: true
 
 - name: Configure vsftpd
   ansible.builtin.copy:
     dest: /etc/vsftpd/vsftpd.conf
+    owner: root
+    group: root
+    mode: "0644"
     content: |
       anonymous_enable=NO
       local_enable=YES
@@ -42,12 +52,17 @@
       pam_service_name=vsftpd
       userlist_enable=YES
 
+      # Passive mode (for opened range ports)
       pasv_enable=YES
-      pasv_min_port=40000
-      pasv_max_port=40050
+      pasv_min_port={{ ftp_pasv_min_port }}
+      pasv_max_port={{ ftp_pasv_max_port }}
 
-      # Logs and others things can set later
+      # Log-file (optional)
+      xferlog_file=/var/log/vsftpd.log
+
   notify: restart vsftpd
+
+# --- Firewall (already set, but let role to be idempotent) ---
 
 - name: Allow FTP service in firewalld
   ansible.builtin.firewalld:
@@ -56,19 +71,33 @@
     immediate: true
     state: enabled
 
-- name: Allow passive ports in firewalld
+- name: Allow passive FTP ports in firewalld
   ansible.builtin.firewalld:
     port: "{{ item }}/tcp"
     permanent: true
     immediate: true
     state: enabled
-  loop: "{{ range(40000,40051) | list }}"
+  loop: "{{ range(ftp_pasv_min_port, ftp_pasv_max_port + 1) | list }}"
 
-- name: Enable SELinux ftp access to NFS
-  ansible.builtin.command: setsebool -P ftpd_use_nfs on
+# --- SELinux ---
+
+- name: Ensure ftpd_use_nfs SELinux boolean is on
+  ansible.posix.seboolean:
+    name: ftpd_use_nfs
+    state: true
+    persistent: true
+
+#- name: Allow FTP server to access NFS via SELinux
+#  ansible.builtin.command: setsebool -P ftpd_use_nfs on
 
 - name: Enable and start vsftpd
   ansible.builtin.service:
     name: vsftpd
     state: started
     enabled: true
+
+- name: Test write as webftp to NFS webcontent
+  ansible.builtin.command: >
+    runuser -u {{ ftp_user }} -- touch {{ ftp_nfs_web_root }}/ansible_test_$$.tmp
+  register: ftp_write_test
+  failed_when: ftp_write_test.rc != 0

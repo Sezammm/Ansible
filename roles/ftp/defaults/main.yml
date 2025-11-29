@@ -1,0 +1,11 @@
+---
+ftp_user: "webftp"
+
+# Hash of password "password", that you have it in /etc/shadow (to make new hash-password do this command: mkpasswd -m sha-512)
+ftp_password_hash: "$6$passlib$Ec0k2KAmmMV08cFPei3qJGdOcB/TOVeIm5PoBdp32Uszx1QyljbqkzWd.V3cchGarlLdcPdvvBJ5FtiPNPVXT."
+
+ftp_pasv_min_port: 40000
+ftp_pasv_max_port: 40050
+
+# Path on NFS, that we able to connect from Windows OS
+ftp_nfs_web_root: "/mnt/nfs/data/webcontent"
