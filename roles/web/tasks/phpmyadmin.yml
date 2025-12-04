@@ -1,0 +1,90 @@
+---
+# Install PHP + phpMyAdmin from official tarball and expose at /phpmyadmin
+
+- name: Install PHP and required extensions
+  ansible.builtin.yum:
+    name:
+      - php
+      - php-mysqlnd
+      - php-mbstring
+      - php-json
+      - php-fpm
+    state: present
+
+# Directory where will locate phpMyAdmin
+- name: Create phpMyAdmin directory
+  ansible.builtin.file:
+    path: /var/www/html/phpmyadmin
+    state: directory
+    owner: apache
+    group: apache
+    mode: "0755"
+
+# Link to tar.gz can update if need it (ver. 5.2.1 like example)
+- name: Download phpMyAdmin tarball
+  ansible.builtin.get_url:
+    url: https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz
+    dest: /tmp/phpMyAdmin.tar.gz
+    mode: "0644"
+
+- name: Extract phpMyAdmin
+  ansible.builtin.unarchive:
+    src: /tmp/phpMyAdmin.tar.gz
+    dest: /var/www/html/
+    remote_src: true
+    creates: /var/www/html/phpMyAdmin-5.2.1-all-languages
+
+- name: Ensure rsync is installed for phpMyAdmin sync
+  ansible.builtin.yum:
+    name: rsync
+    state: present
+
+- name: Sync extracted phpMyAdmin to /var/www/html/phpmyadmin
+  ansible.builtin.shell: >
+    rsync -a --delete /var/www/html/phpMyAdmin-5.2.1-all-languages/ /var/www/html/phpmyadmin/
+
+- name: Ensure correct ownership for phpMyAdmin files
+  ansible.builtin.file:
+    path: /var/www/html/phpmyadmin
+    state: directory
+    recurse: true
+    owner: apache
+    group: apache
+    mode: "0755"
+
+# Minimal config.inc.php
+- name: Create basic config.inc.php for phpMyAdmin
+  ansible.builtin.copy:
+    dest: /var/www/html/phpmyadmin/config.inc.php
+    owner: apache
+    group: apache
+    mode: "0640"
+    content: |
+      <?php
+      /* Minimal phpMyAdmin configuration for LAB */
+      $cfg['blowfish_secret'] = 'my_super_secret_blowfish_12345'; /* YOU SHOULD CHANGE THIS FOR REAL */
+      $i = 0;
+      $i++;
+      $cfg['Servers'][$i]['auth_type'] = 'cookie';
+      $cfg['Servers'][$i]['host'] = '192.168.3.203';
+      $cfg['Servers'][$i]['compress'] = false;
+      $cfg['Servers'][$i]['AllowNoPassword'] = false;
+      ?>
+
+# Our own Apache-config for /phpmyadmin (Do not touch system phpMyAdmin.conf)
+- name: Create Apache config for phpMyAdmin (local)
+  ansible.builtin.copy:
+    dest: /etc/httpd/conf.d/phpmyadmin-local.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Local phpMyAdmin config managed by Ansible
+
+      Alias /phpmyadmin /var/www/html/phpmyadmin
+
+      <Directory /var/www/html/phpmyadmin>
+          AllowOverride None
+          Require all granted
+      </Directory>
+  notify: restart httpd

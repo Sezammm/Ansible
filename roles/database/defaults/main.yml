@@ -9,3 +9,4 @@ app_db_password: "LabUserPass123!"
 
 # Should MariaDB listen on all interfaces (0.0.0.0) for remote access
 mysql_bind_address: "0.0.0.0"
+sample_db_name: "sampledb"

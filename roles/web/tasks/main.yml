@@ -18,6 +18,12 @@
     immediate: true
     state: enabled
 
+- name: Allow httpd to connect to remote DB (SELinux)
+  ansible.posix.seboolean:
+    name: httpd_can_network_connect_db
+    state: true
+    persistent: true
+
 - name: Optionally open HTTPS port in firewalld
   ansible.builtin.firewalld:
     service: https
@@ -25,6 +31,10 @@
     immediate: true
     state: enabled
   when: open_https | bool
+
+# ---------- Setup phpMyAdmin ----------
+
+- import_tasks: phpmyadmin.yml
 
 # ---------- Virtual hosts: directories and index.html ----------
 

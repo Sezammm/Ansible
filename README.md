@@ -42,9 +42,8 @@ All those hosts described in `hosts.ini` like: `ansible`, `dns`, `ntp`, `databas
 .
 ├── ansible.cfg                  # Main Ansible settings: inventory, SSH options, privilege escalation
 ├── hosts.ini                    # Inventory file with host groups and variables
-├── site.yml                     # Main entry point: includes all roles in correct order
 ├── README.md                    # Project documentation (this file)
-
+|
 ├── roles/                       # All automation roles
 │   ├── dns/                     # Bind DNS Server role
 │   │   ├── tasks/
@@ -103,21 +102,8 @@ All those hosts described in `hosts.ini` like: `ansible`, `dns`, `ntp`, `databas
 │   │   └── handlers/main.yml
 │   │
 │   └── docker/ (optional)       # Docker Swarm automation
-
-├── Archive/                     # Backups and deprecated playbooks
-│   ├── old_playbooks/
-│   └── playbooks/
-│       ├── 1_dns.yml
-│       ├── 2_dns_clients.yml
-│       ├── 3_ntp.yml
-│       ├── 4_ntp_clients.yml
-│       ├── 5_web.yml
-│       ├── 6_mariadb.yml
-│       └── templates/           # Templates used by old playbooks
-│           ├── ziyotek.local.db.j2
-│           ├── reverse.3.168.192.in-addr.arpa.j2
-│           ├── chrony.server.conf.j2
-│           └── chrony.client.conf.j2
+|
+├── site.yml                     # Main entry point: includes all roles in correct order
 
 
 
@@ -238,6 +224,10 @@ Run only specific roles:
   ansible-playbook site.yml --limit web
   ansible-playbook site.yml --limit nagios
   ansible-playbook site.yml --limit "clients:!nfs"
+
+jhfgjhfg
+lkhjlkh
+
 
 Verification Checklist
 DNS:

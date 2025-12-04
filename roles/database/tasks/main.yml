@@ -76,6 +76,23 @@
     "
   changed_when: false
 
+# ---------- Create sample database ----------
+
+- name: Create sample database for LAB
+  ansible.builtin.shell: |
+    mysql -u root -p'{{ mysql_root_password }}' -e "CREATE DATABASE IF NOT EXISTS {{ sample_db_name }};"
+  changed_when: false
+
+- name: CLI check - show databases
+  ansible.builtin.shell: |
+    mysql -u root -p'{{ mysql_root_password }}' -e "SHOW DATABASES;"
+  register: db_list
+  changed_when: false
+
+- name: Debug database list (for LAB report)
+  ansible.builtin.debug:
+    var: db_list.stdout_lines
+
 # ---------- Firewall ----------
 
 - name: Open MariaDB port in firewalld

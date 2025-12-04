@@ -55,10 +55,17 @@
   args:
     creates: /usr/local/nagios/bin/nagios
 
+- name: Check if Nagios Apache config already installed
+  ansible.builtin.stat:
+    path: /etc/httpd/conf.d/nagios.conf
+  register: nagios_apache_conf
+
 - name: Install Apache config for Nagios
-  shell: |
+  ansible.builtin.shell: |
     cd /tmp/nagios-* &&
     make install-webconf
+  when: not nagios_apache_conf.stat.exists
+  ignore_errors: true
   notify: restart httpd
 
 - name: Enable Apache CGI
