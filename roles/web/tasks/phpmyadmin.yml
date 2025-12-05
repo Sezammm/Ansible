@@ -52,6 +52,37 @@
     group: apache
     mode: "0755"
 
+- name: Create phpMyAdmin temp directory
+  ansible.builtin.file:
+    path: /var/www/html/phpmyadmin/tmp
+    state: directory
+    owner: apache
+    group: apache
+    mode: "0770"
+
+- name: Install tools for SELinux fcontext management
+  ansible.builtin.yum:
+    name: policycoreutils-python-utils
+    state: present
+
+- name: Ensure SELinux fcontext rule for phpMyAdmin tmp
+  ansible.builtin.shell: |
+    semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/phpmyadmin/tmp(/.*)?' || \
+    semanage fcontext -m -t httpd_sys_rw_content_t '/var/www/html/phpmyadmin/tmp(/.*)?'
+  changed_when: false
+
+- name: Restore SELinux context on phpMyAdmin temp dir
+  ansible.builtin.command: restorecon -Rv /var/www/html/phpmyadmin/tmp
+  changed_when: false
+
+- name: Verify phpMyAdmin temp dir writable by apache (LAB check)
+  become: true
+  ansible.builtin.shell: |
+    sudo -u apache test -w /var/www/html/phpmyadmin/tmp
+  register: phpmyadmin_tmp_test
+  failed_when: phpmyadmin_tmp_test.rc != 0
+  changed_when: false
+
 # Minimal config.inc.php
 - name: Create basic config.inc.php for phpMyAdmin
   ansible.builtin.copy:
@@ -62,13 +93,14 @@
     content: |
       <?php
       /* Minimal phpMyAdmin configuration for LAB */
-      $cfg['blowfish_secret'] = 'my_super_secret_blowfish_12345'; /* YOU SHOULD CHANGE THIS FOR REAL */
+      $cfg['blowfish_secret'] = '1234567890abcdef1234567890abcdef'; /* 32 chars */
       $i = 0;
       $i++;
       $cfg['Servers'][$i]['auth_type'] = 'cookie';
       $cfg['Servers'][$i]['host'] = '192.168.3.203';
       $cfg['Servers'][$i]['compress'] = false;
       $cfg['Servers'][$i]['AllowNoPassword'] = false;
+      $cfg['TempDir'] = '/var/www/html/phpmyadmin/tmp';
       ?>
 
 # Our own Apache-config for /phpmyadmin (Do not touch system phpMyAdmin.conf)
