@@ -21,8 +21,8 @@
           <title>Docker Web {{ ansible_hostname }}</title>
         </head>
         <body>
-          <h1>Привет с {{ ansible_hostname }}</h1>
-          <p>Эта страница идет из Docker контейнера, а картинка - с NFS.</p>
+          <h1>Hello from {{ ansible_hostname }}</h1>
+          <p>This page open from Docker container, picture from NFS.</p>
           <img src="/static/image.jpg" alt="NFS image">
         </body>
       </html>
