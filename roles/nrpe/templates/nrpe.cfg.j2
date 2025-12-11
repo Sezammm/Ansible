@@ -20,3 +20,6 @@ command[check_load]=/usr/lib64/nagios/plugins/check_load -w 5,4,3 -c 10,6,4
 command[check_disk_root]=/usr/lib64/nagios/plugins/check_disk -w 20% -c 10% -p /
 command[check_procs]=/usr/lib64/nagios/plugins/check_procs -w 150 -c 250
 command[check_users]=/usr/lib64/nagios/plugins/check_users -w 5 -c 10
+command[check_httpd]=/usr/lib64/nagios/plugins/check_procs -c 1: -C httpd
+command[check_vsftpd]=/usr/lib64/nagios/plugins/check_procs -c 1: -C vsftpd
+command[check_nfsd]=/usr/lib64/nagios/plugins/check_procs -c 1: -C nfsd

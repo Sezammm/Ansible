@@ -1,0 +1,28 @@
+# ---
+# - name: Install NFS client utils
+#   ansible.builtin.yum:
+#     name: nfs-utils
+#     state: present
+
+# - name: Create /clientshare directory
+#   ansible.builtin.file:
+#     path: /clientshare
+#     state: directory
+#     owner: root
+#     group: root
+#     mode: "0777"   # Just for LAB acceptable
+
+# - name: Ensure /etc/fstab entry for shared NFS
+#   ansible.builtin.lineinfile:
+#     path: /etc/fstab
+#     regexp: '^192\.168\.3\.208:/var/nfs/shared'
+#     line: '192.168.3.208:/var/nfs/shared  /clientshare  nfs  defaults,_netdev  0 0'
+#     state: present
+#     backup: yes
+
+# - name: Mount /clientshare
+#   ansible.builtin.mount:
+#     path: /clientshare
+#     src: 192.168.3.208:/var/nfs/shared
+#     fstype: nfs
+#     state: mounted

@@ -15,3 +15,42 @@ define service{
     service_description     Disk Root /
     check_command           check_nrpe!check_disk_root
 }
+
+# Apache on web-server
+define service{
+    use                     generic-service
+    host_name               prdx-webserver101
+    service_description     Apache httpd
+    check_command           check_nrpe!check_httpd
+}
+
+# FTP on ftp-server
+define service{
+    use                     generic-service
+    host_name               prdx-ftp101
+    service_description     FTP vsftpd
+    check_command           check_nrpe!check_vsftpd
+}
+
+# NFS on nfs-server
+define service{
+    use                     generic-service
+    host_name               prdx-nfs101
+    service_description     NFS server
+    check_command           check_nrpe!check_nfsd
+}
+
+# Additionally common metrics (processes)
+define service{
+    use                     generic-service
+    host_name               prdx-ansible101,prdx-nsprimary101,prdx-ntp101,prdx-db101,prdx-webserver101,prdx-haproxy101,prdx-nagios101,prdx-ftp101,prdx-nfs101,prdx-dprimary101,prdx-dworker101,prdx-dworker102
+    service_description     Processes count
+    check_command           check_nrpe!check_procs
+}
+
+define service{
+    use                     generic-service
+    host_name               prdx-ansible101,prdx-nsprimary101,prdx-ntp101,prdx-db101,prdx-webserver101,prdx-haproxy101,prdx-nagios101,prdx-ftp101,prdx-nfs101,prdx-dprimary101,prdx-dworker101,prdx-dworker102
+    service_description     Logged in users
+    check_command           check_nrpe!check_users
+}

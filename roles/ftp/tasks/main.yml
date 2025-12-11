@@ -93,9 +93,3 @@
     name: vsftpd
     state: started
     enabled: true
-
-#- name: Test write as webftp to NFS webcontent
-#  ansible.builtin.command: >
-#    runuser -u {{ ftp_user }} -- touch {{ ftp_nfs_web_root }}/ansible_test_$$.selinux.tmp
-#  register: ftp_write_test
-#  failed_when: ftp_write_test.rc != 0

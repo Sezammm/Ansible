@@ -1,0 +1,10 @@
+---
+- name: Install common packages on all boxes
+  ansible.builtin.yum:
+    name:
+      - bind-utils
+      - man
+      - man-pages
+      - mlocate
+      - sysstat
+    state: present

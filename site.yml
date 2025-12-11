@@ -1,4 +1,10 @@
 ---
+- name: Apply basic security hardening
+  hosts: clients
+  become: true
+  roles:
+    - security
+
 - name: Configure DNS server
   hosts: dns
   become: true
@@ -72,8 +78,27 @@
     - docker_common
     - docker_webapp
 
+# - name: Configure Docker web app on manager
+#   hosts: docker_manager
+#   become: true
+#   roles:
+#     - docker_common
+#     - docker_webapp
+
 - name: Configure Load Balancer (HAProxy)
   hosts: loadbalancer
   become: true
   roles:
     - loadbalancer
+
+# - name: Configure NFS shared mount (/clientshare) on clients
+#   hosts: "clients:!nfs"
+#   become: true
+#   roles:
+#     - nfs_shared_client
+
+- name: Install common packages on all servers
+  hosts: clients
+  become: true
+  roles:
+    - common_packages
