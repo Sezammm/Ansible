@@ -50,7 +50,19 @@
 - name: Run web container labweb
   ansible.builtin.command: >
     docker run -d
+    --restart unless-stopped
     --name labweb
     -p 8080:80
     -v /mnt/nfs/data/webcontent:/usr/share/nginx/html/static:ro
     labweb:latest
+
+# - name: Run web container labweb
+#   community.docker.docker_container:
+#     name: labweb
+#     image: labweb:latest
+#     state: started
+#     restart_policy: always        # <<< this is important
+#     published_ports:
+#       - "8080:80"
+#     volumes:
+#       - "/mnt/nfs/data/webcontent:/usr/share/nginx/html/static:ro"
